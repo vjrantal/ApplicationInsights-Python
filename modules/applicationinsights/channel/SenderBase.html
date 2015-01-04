@@ -1,0 +1,219 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>applicationinsights.channel.SenderBase &mdash; Application Insights SDK for Python 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.5.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for applicationinsights.channel.SenderBase</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c"># Python 2.x</span>
+    <span class="kn">import</span> <span class="nn">urllib2</span> <span class="kn">as</span> <span class="nn">HTTPClient</span>
+    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">HTTPError</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c"># Python 3.x</span>
+    <span class="kn">import</span> <span class="nn">urllib.request</span> <span class="kn">as</span> <span class="nn">HTTPClient</span>
+    <span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span>
+
+<div class="viewcode-block" id="SenderBase"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.SenderBase">[docs]</a><span class="k">class</span> <span class="nc">SenderBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The base class for all types of senders for use in conjunction with an implementation of :class:`QueueBase`.</span>
+
+<span class="sd">    The queue will notify the sender that it needs to pick up items. The concrete sender implementation will</span>
+<span class="sd">    listen to these notifications and will pull items from the queue getting at most :func:`send_buffer_size` items.</span>
+<span class="sd">    It will then call :func:`send` using the list of items pulled from the queue.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_endpoint_uri</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes a new instance of the class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_endpoint_uri (str) the address of the service to send telemetry data to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint_uri</span> <span class="o">=</span> <span class="n">service_endpoint_uri</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_buffer_size</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">service_endpoint_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The HTTP or HTTPS endpoint that this sender will send data to.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (str). the service endpoint URI.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str. the service endpoint URI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint_uri</span>
+
+    <span class="nd">@service_endpoint_uri.setter</span>
+    <span class="k">def</span> <span class="nf">service_endpoint_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The service endpoint URI where this sender will send data to.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (str). the service endpoint URI.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str. the service endpoint URI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint_uri</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The queue that this sender is draining. While :class:`SenderBase` doesn&#39;t implement any means of doing</span>
+<span class="sd">        so, derivations of this class do.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (:class:`QueueBase`). the queue instance that this sender is draining.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :class:`QueueBase`. the queue instance that this sender is draining.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span>
+
+    <span class="nd">@queue.setter</span>
+    <span class="k">def</span> <span class="nf">queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The queue that this sender is draining. While :class:`SenderBase` doesn&#39;t implement any means of doing</span>
+<span class="sd">        so, derivations of this class do.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (:class:`QueueBase`). the queue instance that this sender is draining.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :class:`QueueBase`. the queue instance that this sender is draining.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">send_buffer_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The buffer size for a single batch of telemetry. This is the maximum number of items in a single service</span>
+<span class="sd">        request that this sender is going to send.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int). the maximum number of items in a telemetry batch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int. the maximum number of items in a telemetry batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_buffer_size</span>
+
+    <span class="nd">@send_buffer_size.setter</span>
+    <span class="k">def</span> <span class="nf">send_buffer_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The buffer size for a single batch of telemetry. This is the maximum number of items in a single service</span>
+<span class="sd">        request that this sender is going to send.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int). the maximum number of items in a telemetry batch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int. the maximum number of items in a telemetry batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_buffer_size</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="SenderBase.send"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.SenderBase.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_to_send</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Immediately sends the data passed in to :func:`service_endpoint_uri`. If the service request fails, the</span>
+<span class="sd">        passed in items are pushed back to the :func:`queue`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_to_send (Array): an array of :class:`contracts.Envelope` objects to send to the service.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">request_payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span> <span class="n">a</span><span class="o">.</span><span class="n">write</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">data_to_send</span> <span class="p">])</span>
+
+        <span class="n">request</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint_uri</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">request_payload</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">),</span> <span class="p">{</span> <span class="s">&#39;Accept&#39;</span><span class="p">:</span> <span class="s">&#39;application/json&#39;</span><span class="p">,</span> <span class="s">&#39;Content-Type&#39;</span> <span class="p">:</span> <span class="s">&#39;application/json; charset=utf-8&#39;</span> <span class="p">})</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">status_code</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">getcode</span><span class="p">()</span>
+            <span class="k">if</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">getcode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c"># Add our unsent data back on to the queue</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_to_send</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>

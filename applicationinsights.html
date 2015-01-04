@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>applicationinsights module &mdash; Application Insights SDK for Python 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.5.0 documentation" href="index.html" />
+    <link rel="next" title="applicationinsights.logging module" href="applicationinsights.logging.html" />
+    <link rel="prev" title="Application Insights SDK for Python" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="applicationinsights.logging.html" title="applicationinsights.logging module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Application Insights SDK for Python"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="applicationinsights-module">
+<h1>applicationinsights module<a class="headerlink" href="#applicationinsights-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="telemetryclient-class">
+<h2>TelemetryClient class<a class="headerlink" href="#telemetryclient-class" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="applicationinsights.TelemetryClient">
+<em class="property">class </em><code class="descclassname">applicationinsights.</code><code class="descname">TelemetryClient</code><span class="sig-paren">(</span><em>telemetry_channel=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>The telemetry client used for sending all types of telemetry. It serves as the main entry point for
+interacting with the Application Insights service.</p>
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.flush">
+<code class="descname">flush</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flushes data in the queue. Data in the queue will be sent either immediately irrespective of what sender is
+being used.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.track_event">
+<code class="descname">track_event</code><span class="sig-paren">(</span><em>name</em>, <em>properties=None</em>, <em>measurements=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.track_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.track_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send information about a single event that has occurred in the context of the application.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">name (str). the data to associate to this event.</p>
+<p>properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
+<p class="last">measurements (dict). the set of custom measurements the client wants to attach to this data item. (defaults to: None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.track_exception">
+<code class="descname">track_exception</code><span class="sig-paren">(</span><em>type=None</em>, <em>value=None</em>, <em>tb=None</em>, <em>properties=None</em>, <em>measurements=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.track_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.track_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send information about a single exception that occurred in the application.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">type (Type). the type of the exception that was thrown.</p>
+<p>value (<code class="xref py py-class docutils literal"><span class="pre">Exception</span></code>). the exception that the client wants to send.</p>
+<p>tb (<code class="xref py py-class docutils literal"><span class="pre">Traceback</span></code>). the traceback information as returned by <a class="reference external" href="http://docs.python.org/library/sys.html#sys.exc_info" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">sys.exc_info()</span></code></a>.</p>
+<p>properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
+<p class="last">measurements (dict). the set of custom measurements the client wants to attach to this data item. (defaults to: None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.track_metric">
+<code class="descname">track_metric</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>type=None</em>, <em>count=None</em>, <em>min=None</em>, <em>max=None</em>, <em>std_dev=None</em>, <em>properties=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.track_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.track_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send information about a single metric data point that was captured for the application.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">name (str). the name of the metric that was captured.</p>
+<p>value (float). the value of the metric that was captured.</p>
+<p>type (<code class="xref py py-class docutils literal"><span class="pre">channel.contracts.DataPointType</span></code>). the type of the metric. (defaults to: <code class="xref py py-func docutils literal"><span class="pre">channel.contracts.DataPointType.aggregation()</span></code>)</p>
+<p>count (int). the number of metrics that were aggregated into this data point. (defaults to: None)</p>
+<p>min (float). the minimum of all metrics collected that were aggregated into this data point. (defaults to: None)</p>
+<p>max (float). the maximum of all metrics collected that were aggregated into this data point. (defaults to: None)</p>
+<p>std_dev (float). the standard deviation of all metrics collected that were aggregated into this data point. (defaults to: None)</p>
+<p class="last">properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.track_pageview">
+<code class="descname">track_pageview</code><span class="sig-paren">(</span><em>name</em>, <em>url</em>, <em>duration=0</em>, <em>properties=None</em>, <em>measurements=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.track_pageview"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.track_pageview" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send information about the page viewed in the application (a web page for instance).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">name (str). the name of the page that was viewed.</p>
+<p>url (str). the URL of the page that was viewed.</p>
+<p>duration (int). the duration of the page view in milliseconds. (defaults to: 0)</p>
+<p>properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
+<p class="last">measurements (dict). the set of custom measurements the client wants to attach to this data item. (defaults to: None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.track_trace">
+<code class="descname">track_trace</code><span class="sig-paren">(</span><em>name</em>, <em>properties=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.track_trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.track_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a single trace statement.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">name (str). the trace statement.</p>
+<p class="last">properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="applicationinsights.TelemetryClient.channel">
+<code class="descname">channel</code><a class="headerlink" href="#applicationinsights.TelemetryClient.channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The channel associated with this telemetry client. All data created by this client will be passed along with
+the <code class="xref py py-func docutils literal"><span class="pre">context()</span></code> object to <code class="xref py py-class docutils literal"><span class="pre">channel.TelemetryChannel</span></code>&#8216;s <code class="xref py py-func docutils literal"><span class="pre">write()</span></code>.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">channel.TelemetryChannel</span></code>. the channel instance.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="applicationinsights.TelemetryClient.context">
+<code class="descname">context</code><a class="headerlink" href="#applicationinsights.TelemetryClient.context" title="Permalink to this definition">¶</a></dt>
+<dd><p>The context associated with this client. All data objects created by this client will be accompanied by
+this value.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">channel.TelemetryChannel</span></code>. the context instance.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">applicationinsights module</a><ul>
+<li><a class="reference internal" href="#telemetryclient-class">TelemetryClient class</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Application Insights SDK for Python</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="applicationinsights.logging.html"
+                        title="next chapter">applicationinsights.logging module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/applicationinsights.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="applicationinsights.logging.html" title="applicationinsights.logging module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Application Insights SDK for Python"
+             >previous</a> |</li>
+        <li><a href="index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>

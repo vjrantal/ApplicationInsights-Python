@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>applicationinsights.channel.TelemetryChannel &mdash; Application Insights SDK for Python 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.5.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for applicationinsights.channel.TelemetryChannel</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">.SynchronousQueue</span> <span class="kn">import</span> <span class="n">SynchronousQueue</span>
+<span class="kn">from</span> <span class="nn">.SynchronousSender</span> <span class="kn">import</span> <span class="n">SynchronousSender</span>
+<span class="kn">from</span> <span class="nn">.TelemetryContext</span> <span class="kn">import</span> <span class="n">TelemetryContext</span>
+<span class="kn">from</span> <span class="nn">applicationinsights.channel</span> <span class="kn">import</span> <span class="n">contracts</span>
+
+<span class="n">platform_moniker</span> <span class="o">=</span> <span class="s">&#39;py2&#39;</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">platform_moniker</span> <span class="o">=</span> <span class="s">&#39;py3&#39;</span>
+
+<span class="c"># set up internal context</span>
+<span class="n">internal_context</span> <span class="o">=</span> <span class="n">contracts</span><span class="o">.</span><span class="n">Internal</span><span class="p">()</span>
+<span class="n">internal_context</span><span class="o">.</span><span class="n">sdk_version</span> <span class="o">=</span> <span class="n">platform_moniker</span> <span class="o">+</span> <span class="s">&#39;:0.2.0&#39;</span>
+
+<div class="viewcode-block" id="TelemetryChannel"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.TelemetryChannel.TelemetryChannel">[docs]</a><span class="k">class</span> <span class="nc">TelemetryChannel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The telemetry channel is responsible for constructing a :class:`contracts.Envelope` object from the passed in</span>
+<span class="sd">    data and specified telemetry context.</span>
+
+<span class="sd">    .. code:: python</span>
+
+<span class="sd">        from application_insights.channel import TelemetryChannel, contracts</span>
+<span class="sd">        channel = TelemetryChannel()</span>
+<span class="sd">        event = contracts.EventData()</span>
+<span class="sd">        event.name = &#39;My event&#39;</span>
+<span class="sd">        channel.write(event)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes a new instance of the class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context (:class:`TelemetryContext&#39;) the telemetry context to use when sending telemetry data.\n</span>
+<span class="sd">            queue (:class:`QueueBase`) the queue to enqueue the resulting :class:`contracts.Envelope` to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">TelemetryContext</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">queue</span> <span class="ow">or</span> <span class="n">SynchronousQueue</span><span class="p">(</span><span class="n">SynchronousSender</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The context associated with this channel. All :class:`contracts.Envelope` objects created by this channel</span>
+<span class="sd">        will use this value if it&#39;s present or if none is specified as part of the :func:`write` call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (:class:`TelemetryContext`). the context instance (defaults to: TelemetryContext())</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The queue associated with this channel. All :class:`contracts.Envelope` objects created by this channel</span>
+<span class="sd">        will be pushed to this queue.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (:class:`QueueBase`). the queue instance (defaults to: SynchronousQueue())</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sender</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The sender associated with this channel. This instance will be used to transmit telemetry to the service.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (:class:`SenderBase`). the sender instance (defaults to: SynchronousSender())</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">sender</span>
+
+<div class="viewcode-block" id="TelemetryChannel.flush"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.TelemetryChannel.TelemetryChannel.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Flushes the enqueued data by calling :func:`flush` on :func:`queue`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="TelemetryChannel.write"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.TelemetryChannel.TelemetryChannel.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Enqueues the passed in data to the :func:`queue`. If the caller specifies a context as well, it will</span>
+<span class="sd">        take precedence over the instance in :func:`context`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (object). data the telemetry data to send. This will be wrapped in an :class:`contracts.Envelope`</span>
+<span class="sd">                before being enqueued to the :func:`queue`.</span>
+<span class="sd">            context (:class:`TelemetryContext`). context the override context to use when constructing the</span>
+<span class="sd">                :class:`contracts.Envelope`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">local_context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_context</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Context was required but not provided&#39;</span><span class="p">)</span>
+                 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Data was required but not provided&#39;</span><span class="p">)</span>
+
+        <span class="n">envelope</span> <span class="o">=</span> <span class="n">contracts</span><span class="o">.</span><span class="n">Envelope</span><span class="p">()</span>
+        <span class="n">envelope</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ENVELOPE_TYPE_NAME</span>
+        <span class="n">envelope</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;Z&#39;</span>
+        <span class="n">envelope</span><span class="o">.</span><span class="n">ikey</span> <span class="o">=</span> <span class="n">local_context</span><span class="o">.</span><span class="n">instrumentation_key</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="n">envelope</span><span class="o">.</span><span class="n">tags</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_tags</span><span class="p">(</span><span class="n">local_context</span><span class="p">):</span>
+            <span class="n">tags</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">envelope</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">contracts</span><span class="o">.</span><span class="n">Data</span><span class="p">()</span>
+        <span class="n">envelope</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">base_type</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DATA_TYPE_NAME</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s">&#39;properties&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">local_context</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+            <span class="n">properties</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">properties</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">properties</span><span class="p">:</span>
+                <span class="n">properties</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">local_context</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">envelope</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">base_data</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">envelope</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_write_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">internal_context</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">operation</span> <span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">write</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">pair</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>

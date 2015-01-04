@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Application Insights SDK for Python &mdash; Application Insights SDK for Python 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.5.0 documentation" href="#" />
+    <link rel="next" title="applicationinsights module" href="applicationinsights.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="applicationinsights.html" title="applicationinsights module"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="application-insights-sdk-for-python">
+<h1>Application Insights SDK for Python<a class="headerlink" href="#application-insights-sdk-for-python" title="Permalink to this headline">¶</a></h1>
+<div class="sidebar">
+<p class="first sidebar-title">Usage</p>
+<p>Once installed, you can send telemetry to Application Insights. Here are a few samples.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#usage-sample-01"><em>Sending a simple event telemetry item</em></a></li>
+<li><a class="reference internal" href="#usage-sample-02"><em>Sending an event telemetry item with custom properties and measurements</em></a></li>
+<li><a class="reference internal" href="#usage-sample-03"><em>Sending a trace telemetry item with custom properties</em></a></li>
+<li><a class="reference internal" href="#usage-sample-04"><em>Sending a metric telemetry item</em></a></li>
+<li><a class="reference internal" href="#usage-sample-05"><em>Sending an exception telemetry item with custom properties and measurements</em></a></li>
+<li><a class="reference internal" href="#usage-sample-06"><em>Configuring context for a telemetry client instance</em></a></li>
+<li><a class="reference internal" href="#usage-sample-07"><em>Configuring channel related properties</em></a></li>
+<li><a class="reference internal" href="#usage-sample-08"><em>Configuring synchronous (default) channel properties</em></a></li>
+<li><a class="reference internal" href="#usage-sample-09"><em>Configuring an asynchronous channel instead of the synchronous default</em></a></li>
+<li><a class="reference internal" href="#usage-sample-10"><em>Configuring asynchronous channel properties</em></a></li>
+<li><a class="reference internal" href="#usage-sample-11"><em>Basic logging configuration</em></a></li>
+<li><a class="reference internal" href="#usage-sample-12"><em>Advanced logging configuration</em></a></li>
+</ul>
+</div>
+<div class="line-block">
+<div class="line">Python is an easy to learn, powerful programming language. It has efficient high-level data structures and a simple but effective approach to object-oriented programming. Python&#8217;s elegant syntax and dynamic typing, together with its interpreted nature, make it an ideal language for scripting and rapid application development in many areas on most platforms.</div>
+<div class="line">&#8211; <a class="reference external" href="https://docs.python.org/3/tutorial/">The Python Tutorial - Introduction</a></div>
+</div>
+<p>This project extends the Application Insights API surface to support Python. <a class="reference external" href="http://azure.microsoft.com/en-us/services/application-insights/">Application
+Insights</a> is a service that allows developers to keep their application available, performing and succeeding. This Python module will allow you to send telemetry of various kinds (event, trace, exception, etc.) to the Application Insights service where they can be visualized in the Azure Portal.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Python 2.7 and Python 3.4 are currently supported by this module.</p>
+<p>For opening the project in Microsoft Visual Studio you will need <a class="reference external" href="http://pytools.codeplex.com/">Python Tools for Visual Studio</a>.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To install the latest release you can use <a class="reference external" href="http://www.pip-installer.org/">pip</a>.</p>
+<div class="highlight-python"><div class="highlight"><pre>$ pip install applicationinsights
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Once installed, you can send telemetry to Application Insights. Here are a few samples.</p>
+<blockquote>
+<div><strong>Note</strong>: before you can send data to you will need an instrumentation key. Please see the <a class="reference external" href="https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key">Getting an Application Insights
+Instrumentation Key</a>
+section for more information.</div></blockquote>
+<p id="usage-sample-01"><strong>Sending a simple event telemetry item</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">track_event</span><span class="p">(</span><span class="s">&quot;Test event&quot;</span><span class="p">)</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-02"><strong>Sending an event telemetry item with custom properties and measurements</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">track_event</span><span class="p">(</span><span class="s">&#39;Test event&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;foo&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;baz&#39;</span><span class="p">:</span> <span class="mi">42</span> <span class="p">})</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-03"><strong>Sending a trace telemetry item with custom properties</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">track_trace</span><span class="p">(</span><span class="s">&#39;Test trace&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;foo&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span> <span class="p">})</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-04"><strong>Sending a metric telemetry item</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">track_metric</span><span class="p">(</span><span class="s">&#39;My Metric&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-05"><strong>Sending an exception telemetry item with custom properties and measurements</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;blah&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">track_exception</span><span class="p">()</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;blah&quot;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">track_exception</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;foo&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span> <span class="p">},</span> <span class="n">measurements</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="mi">42</span> <span class="p">})</span>
+
+<span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-06"><strong>Configuring context for a telemetry client instance</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;My application&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="s">&#39;1.2.3&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;My current device&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">oem_name</span> <span class="o">=</span> <span class="s">&#39;Asus&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s">&#39;X31A&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;Other&quot;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;santa@northpole.net&#39;</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">track_trace</span><span class="p">(</span><span class="s">&#39;My trace with context&#39;</span><span class="p">)</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-07"><strong>Configuring channel related properties</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="c"># flush telemetry every 30 seconds (assuming we don&#39;t hit max_queue_item_count first)</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sender</span><span class="o">.</span><span class="n">send_interval_in_milliseconds</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="c"># flush telemetry if we have 10 or more telemetry items in our queue</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sender</span><span class="o">.</span><span class="n">max_queue_item_count</span> <span class="o">=</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p id="usage-sample-08"><strong>Configuring synchronous (default) channel properties</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="c"># flush telemetry if we have 10 or more telemetry items in our queue</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">max_queue_length</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="c"># send telemetry to the service in batches of 5</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sender</span><span class="o">.</span><span class="n">send_buffer_size</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<p id="usage-sample-09"><strong>Configuring an asynchronous channel instead of the synchronous default</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre>from applicationinsights import TelemetryClient, channel
+sender = channel.AsynchronousSender()
+queue = channel.AsynchronousQueue(sender)
+channel = channel::TelemetryChannel(None, queue)
+tc = TelemetryClient(channel)
+# Note: the event will be sent on a separate thread; if the app finishes before
+#       the thread finishes, the data is lost
+tc.track_event(&#39;My event&#39;)
+</pre></div>
+</div>
+<p id="usage-sample-10"><strong>Configuring asynchronous channel properties</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre>from applicationinsights import TelemetryClient, channel
+sender = channel.AsynchronousSender()
+queue = channel.AsynchronousQueue(sender)
+channel = channel::TelemetryChannel(None, queue)
+tc = TelemetryClient(channel)
+# flush telemetry if we have 10 or more telemetry items in our queue
+tc.channel.queue.max_queue_length = 10
+# send telemetry to the service in batches of 5
+tc.channel.sender.send_buffer_size = 5
+# the background worker thread will be active for 5 seconds before it shuts down. if
+# during this time items are picked up from the queue, the timer is reset.
+tc.channel.sender.send_time = 5
+# the background worker thread will poll the queue every 0.5 seconds for new items
+tc.channel.sender.send_interval = 0.5
+</pre></div>
+</div>
+<p id="usage-sample-11"><strong>Basic logging configuration</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">applicationinsights.logging</span> <span class="kn">import</span> <span class="n">ApplicationInsightsHandler</span>
+
+<span class="c"># set up logging</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">ApplicationInsightsHandler</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">handlers</span><span class="o">=</span><span class="p">[</span> <span class="n">handler</span> <span class="p">],</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(levelname)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="c"># log something (this will be sent to the Application Insights service as a trace)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;This is a message&#39;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Some exception&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="c"># this will send an exception to the Application Insights service</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Code went boom!&#39;</span><span class="p">)</span>
+
+<span class="c"># don&#39;t forget to flush send all un-sent telemetry</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+<p id="usage-sample-12"><strong>Advanced logging configuration</strong></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">applicationinsights.logging</span> <span class="kn">import</span> <span class="n">ApplicationInsightsHandler</span>
+
+<span class="c"># set up logging</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">ApplicationInsightsHandler</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(levelname)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">))</span>
+<span class="n">my_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;simple_logger&#39;</span><span class="p">)</span>
+<span class="n">my_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">my_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+<span class="c"># log something (this will be sent to the Application Insights service as a trace)</span>
+<span class="n">my_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;This is a message&#39;</span><span class="p">)</span>
+
+<span class="c"># don&#39;t forget to flush to send all un-sent telemetry</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Application Insights SDK for Python</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="applicationinsights.html"
+                        title="next chapter">applicationinsights module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="applicationinsights.html" title="applicationinsights module"
+             >next</a> |</li>
+        <li><a href="#">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>

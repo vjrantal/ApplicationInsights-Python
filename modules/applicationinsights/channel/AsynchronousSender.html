@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>applicationinsights.channel.AsynchronousSender &mdash; Application Insights SDK for Python 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.5.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for applicationinsights.channel.AsynchronousSender</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">.SenderBase</span> <span class="kn">import</span> <span class="n">SenderBase</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">Thread</span>
+
+<div class="viewcode-block" id="AsynchronousSender"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.AsynchronousSender">[docs]</a><span class="k">class</span> <span class="nc">AsynchronousSender</span><span class="p">(</span><span class="n">SenderBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An asynchronous sender that works in conjunction with the :class:`AsynchronousQueue`. The sender object will</span>
+<span class="sd">    start a worker thread that will pull items from the :func:`queue`. The thread will be created when the client</span>
+<span class="sd">    calls :func:`start` and will check for queue items every :func:`send_interval` seconds. The worker thread can</span>
+<span class="sd">    also be forced to check the queue by setting the :func:`flush_notification` event.</span>
+
+<span class="sd">    - If no items are found, the thread will go back to sleep.</span>
+<span class="sd">    - If items are found, the worker thread will send items to the specified service in batches of :func:`send_buffer_size`.</span>
+
+<span class="sd">    If no queue items are found for :func:`send_time` seconds, the worker thread will shut down (and :func:`start` will</span>
+<span class="sd">    need  to be called again).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_endpoint_uri</span><span class="o">=</span><span class="s">&#39;https://dc.services.visualstudio.com/v2/track&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes a new instance of the class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sender (String) service_endpoint_uri the address of the service to send telemetry data to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span> <span class="o">=</span> <span class="mf">3.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock_send_remaining_time</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+        <span class="n">SenderBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_endpoint_uri</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">send_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time span in seconds at which the the worker thread will check the :func:`queue` for items (defaults to: 1.0).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int) the interval in seconds.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int. the interval in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span>
+
+    <span class="nd">@send_interval.setter</span>
+    <span class="k">def</span> <span class="nf">send_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time span in seconds at which the the worker thread will check the :func:`queue` for items (defaults to: 1.0).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int) the interval in seconds.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int. the interval in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">send_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time span in seconds at which the the worker thread will check the :func:`queue` for items (defaults to: 1.0).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int) the interval in seconds.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int. the interval in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span>
+
+    <span class="nd">@send_time.setter</span>
+    <span class="k">def</span> <span class="nf">send_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time span in seconds at which the the worker thread will check the :func:`queue` for items (defaults to: 1.0).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int) the interval in seconds.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int. the interval in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="AsynchronousSender.start"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.AsynchronousSender.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a new sender thread if none is not already there</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_send_remaining_time</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">local_send_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                    <span class="n">local_send_interval</span> <span class="o">=</span> <span class="mf">0.1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">&lt;</span> <span class="n">local_send_interval</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">=</span> <span class="n">local_send_interval</span>
+                <span class="n">thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">)</span>
+                <span class="n">thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AsynchronousSender.stop"><a class="viewcode-back" href="../../../applicationinsights.channel.html#applicationinsights.channel.AsynchronousSender.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gracefully stops the sender thread if one is there.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_send_remaining_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+</div>
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># save the queue locally</span>
+        <span class="n">local_queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_queue</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="c"># fix up the send interval (can&#39;t be lower than 100ms)</span>
+        <span class="n">local_send_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_interval</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">local_send_interval</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">local_send_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span>
+        <span class="k">if</span> <span class="n">local_send_time</span> <span class="o">&lt;</span> <span class="n">local_send_interval</span><span class="p">:</span>
+            <span class="n">local_send_time</span> <span class="o">=</span> <span class="n">local_send_interval</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="c"># get at most send_buffer_size items from the queue</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_buffer_size</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">while</span> <span class="n">counter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">local_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="n">counter</span> <span class="o">-=</span> <span class="mi">1</span>
+
+                <span class="c"># if we didn&#39;t get any items from the queue, we&#39;re done here</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="c"># reset the send time</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_send_remaining_time</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">=</span> <span class="n">local_send_time</span>
+
+                <span class="c"># finally send the data</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="c"># wait at most send_interval (or until we get signalled)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">local_queue</span><span class="o">.</span><span class="n">flush_notification</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">local_send_interval</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                <span class="n">local_queue</span><span class="o">.</span><span class="n">flush_notification</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="k">continue</span>
+
+            <span class="c"># decrement the remaining time</span>
+            <span class="n">local_remaining_time</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_send_remaining_time</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span> <span class="o">-=</span> <span class="n">local_send_interval</span>
+                <span class="n">local_remaining_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_remaining_time</span>
+
+            <span class="k">if</span> <span class="n">local_remaining_time</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>
