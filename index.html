@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Application Insights SDK for Python &mdash; Application Insights SDK for Python 0.6.0 documentation</title>
+    <title>Application Insights SDK for Python &mdash; Application Insights SDK for Python 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6.0',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="Application Insights SDK for Python 0.6.0 documentation" href="#" />
+    <link rel="top" title="Application Insights SDK for Python 0.7.0 documentation" href="#" />
     <link rel="next" title="applicationinsights module" href="applicationinsights.html" /> 
   </head>
   <body role="document">
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="applicationinsights.html" title="applicationinsights module"
              accesskey="N">next</a> |</li>
-        <li><a href="#">Application Insights SDK for Python 0.6.0 documentation</a> &raquo;</li> 
+        <li><a href="#">Application Insights SDK for Python 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -72,10 +72,6 @@
 <li><a class="reference internal" href="#usage-sample-14"><em>Logging unhandled exceptions</em></a></li>
 </ul>
 </div>
-<div class="line-block">
-<div class="line">Python is an easy to learn, powerful programming language. It has efficient high-level data structures and a simple but effective approach to object-oriented programming. Python&#8217;s elegant syntax and dynamic typing, together with its interpreted nature, make it an ideal language for scripting and rapid application development in many areas on most platforms.</div>
-<div class="line">&#8211; <a class="reference external" href="https://docs.python.org/3/tutorial/">The Python Tutorial - Introduction</a></div>
-</div>
 <p>This project extends the Application Insights API surface to support Python. <a class="reference external" href="http://azure.microsoft.com/en-us/services/application-insights/">Application
 Insights</a> is a service that allows developers to keep their application available, performing and succeeding. This Python module will allow you to send telemetry of various kinds (event, trace, exception, etc.) to the Application Insights service where they can be visualized in the Azure Portal.</p>
 <div class="section" id="requirements">
@@ -99,32 +95,28 @@ Instrumentation Key</a>
 section for more information.</div></blockquote>
 <p id="usage-sample-01"><strong>Sending a simple event telemetry item</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">track_event</span><span class="p">(</span><span class="s">&quot;Test event&quot;</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
 </div>
 <p id="usage-sample-02"><strong>Sending an event telemetry item with custom properties and measurements</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">track_event</span><span class="p">(</span><span class="s">&#39;Test event&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;foo&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;baz&#39;</span><span class="p">:</span> <span class="mi">42</span> <span class="p">})</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
 </div>
 <p id="usage-sample-03"><strong>Sending a trace telemetry item with custom properties</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">track_trace</span><span class="p">(</span><span class="s">&#39;Test trace&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;foo&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span> <span class="p">})</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
 </div>
 <p id="usage-sample-04"><strong>Sending a metric telemetry item</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">track_metric</span><span class="p">(</span><span class="s">&#39;My Metric&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
@@ -132,8 +124,7 @@ section for more information.</div></blockquote>
 <p id="usage-sample-05"><strong>Sending an exception telemetry item with custom properties and measurements</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;blah&#39;</span><span class="p">)</span>
 <span class="k">except</span><span class="p">:</span>
@@ -149,8 +140,7 @@ section for more information.</div></blockquote>
 </div>
 <p id="usage-sample-06"><strong>Configuring context for a telemetry client instance</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">instrumentation_key</span> <span class="o">=</span> <span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;My application&#39;</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="s">&#39;1.2.3&#39;</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;My current device&#39;</span>
@@ -164,7 +154,7 @@ section for more information.</div></blockquote>
 </div>
 <p id="usage-sample-07"><strong>Configuring channel related properties</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="c"># flush telemetry every 30 seconds (assuming we don&#39;t hit max_queue_item_count first)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sender</span><span class="o">.</span><span class="n">send_interval_in_milliseconds</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">1000</span>
 <span class="c"># flush telemetry if we have 10 or more telemetry items in our queue</span>
@@ -173,7 +163,7 @@ section for more information.</div></blockquote>
 </div>
 <p id="usage-sample-08"><strong>Configuring synchronous (default) channel properties</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">applicationinsights</span> <span class="kn">import</span> <span class="n">TelemetryClient</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">()</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">TelemetryClient</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="c"># flush telemetry if we have 10 or more telemetry items in our queue</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">max_queue_length</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="c"># send telemetry to the service in batches of 5</span>
@@ -185,7 +175,7 @@ section for more information.</div></blockquote>
 sender = channel.AsynchronousSender()
 queue = channel.AsynchronousQueue(sender)
 channel = channel::TelemetryChannel(None, queue)
-tc = TelemetryClient(channel)
+tc = TelemetryClient(&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;, channel)
 # Note: the event will be sent on a separate thread; if the app finishes before
 #       the thread finishes, the data is lost
 tc.track_event(&#39;My event&#39;)
@@ -196,7 +186,7 @@ tc.track_event(&#39;My event&#39;)
 sender = channel.AsynchronousSender()
 queue = channel.AsynchronousQueue(sender)
 channel = channel::TelemetryChannel(None, queue)
-tc = TelemetryClient(channel)
+tc = TelemetryClient(&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;, channel)
 # flush telemetry if we have 10 or more telemetry items in our queue
 tc.channel.queue.max_queue_length = 10
 # send telemetry to the service in batches of 5
@@ -327,7 +317,7 @@ tc.channel.sender.send_interval = 0.5
         <li class="right" >
           <a href="applicationinsights.html" title="applicationinsights module"
              >next</a> |</li>
-        <li><a href="#">Application Insights SDK for Python 0.6.0 documentation</a> &raquo;</li> 
+        <li><a href="#">Application Insights SDK for Python 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
