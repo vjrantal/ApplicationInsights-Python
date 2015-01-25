@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>applicationinsights.logging.ApplicationInsightsHandler &mdash; Application Insights SDK for Python 0.7.0 documentation</title>
+    <title>applicationinsights.logging.LoggingHandler &mdash; Application Insights SDK for Python 0.8.0 documentation</title>
     
     <link rel="stylesheet" href="../../../static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../../../static/jquery.js"></script>
     <script type="text/javascript" src="../../../static/underscore.js"></script>
     <script type="text/javascript" src="../../../static/doctools.js"></script>
-    <link rel="top" title="Application Insights SDK for Python 0.7.0 documentation" href="../../../index.html" />
+    <link rel="top" title="Application Insights SDK for Python 0.8.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="../../../index.html">Application Insights SDK for Python 0.7.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,7 +46,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for applicationinsights.logging.ApplicationInsightsHandler</h1><div class="highlight"><pre>
+  <h1>Source code for applicationinsights.logging.LoggingHandler</h1><div class="highlight"><pre>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">applicationinsights</span>
 
@@ -80,14 +80,14 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Instrumentation key was required but not provided&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">instrumentation_key</span> <span class="ow">in</span> <span class="n">enabled_instrumentation_keys</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">enabled_instrumentation_keys</span><span class="p">[</span><span class="n">instrumentation_key</span><span class="p">])</span>
-    <span class="n">handler</span> <span class="o">=</span> <span class="n">ApplicationInsightsHandler</span><span class="p">(</span><span class="n">instrumentation_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">LoggingHandler</span><span class="p">(</span><span class="n">instrumentation_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
     <span class="n">enabled_instrumentation_keys</span><span class="p">[</span><span class="n">instrumentation_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">handler</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">handler</span>
 
 </div>
-<div class="viewcode-block" id="ApplicationInsightsHandler"><a class="viewcode-back" href="../../../applicationinsights.logging.html#applicationinsights.logging.ApplicationInsightsHandler">[docs]</a><span class="k">class</span> <span class="nc">ApplicationInsightsHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
+<div class="viewcode-block" id="LoggingHandler"><a class="viewcode-back" href="../../../applicationinsights.logging.html#applicationinsights.logging.LoggingHandler">[docs]</a><span class="k">class</span> <span class="nc">LoggingHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This class represents an integration point between Python&#39;s logging framework and the Application Insights</span>
 <span class="sd">    service.</span>
 
@@ -122,15 +122,15 @@
         <span class="k">if</span> <span class="s">&#39;telemetry_channel&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;telemetry_channel&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">applicationinsights</span><span class="o">.</span><span class="n">TelemetryClient</span><span class="p">(</span><span class="n">instrumentation_key</span><span class="p">,</span> <span class="n">telemetry_channel</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ApplicationInsightsHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LoggingHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ApplicationInsightsHandler.flush"><a class="viewcode-back" href="../../../applicationinsights.logging.html#applicationinsights.logging.ApplicationInsightsHandler.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LoggingHandler.flush"><a class="viewcode-back" href="../../../applicationinsights.logging.html#applicationinsights.logging.LoggingHandler.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Flushes the queued up telemetry to the service.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ApplicationInsightsHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">LoggingHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="ApplicationInsightsHandler.emit"><a class="viewcode-back" href="../../../applicationinsights.logging.html#applicationinsights.logging.ApplicationInsightsHandler.emit">[docs]</a>    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+<div class="viewcode-block" id="LoggingHandler.emit"><a class="viewcode-back" href="../../../applicationinsights.logging.html#applicationinsights.logging.LoggingHandler.emit">[docs]</a>    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Emit a record.</span>
 
 <span class="sd">        If a formatter is specified, it is used to format the record. If exception information is present, an Exception</span>
@@ -186,7 +186,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="../../../index.html">Application Insights SDK for Python 0.7.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

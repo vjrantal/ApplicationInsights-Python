@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>applicationinsights.requests.WSGIApplication &mdash; Application Insights SDK for Python 0.8.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.8.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for applicationinsights.requests.WSGIApplication</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">applicationinsights</span>
+
+<span class="k">class</span> <span class="nc">Closure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple closure object used to transfer context between different scopes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="WSGIApplication"><a class="viewcode-back" href="../../../applicationinsights.requests.html#applicationinsights.requests.WSGIApplication">[docs]</a><span class="k">class</span> <span class="nc">WSGIApplication</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This class represents a WSGI wrapper that enables request telemetry for existing WSGI applications. The request</span>
+<span class="sd">    telemetry will be sent to Application Insights service using the supplied instrumentation key.</span>
+
+<span class="sd">    .. code:: python</span>
+
+<span class="sd">            from flask import Flask</span>
+<span class="sd">            from applicationinsights.requests import WSGIApplication</span>
+
+<span class="sd">            # instantiate the Flask application and wrap its WSGI application</span>
+<span class="sd">            app = Flask(__name__)</span>
+<span class="sd">            app.wsgi_app = WSGIApplication(&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;, app.wsgi_app)</span>
+
+<span class="sd">            # define a simple route</span>
+<span class="sd">            @app.route(&#39;/&#39;)</span>
+<span class="sd">            def hello_world():</span>
+<span class="sd">                return &#39;Hello World!&#39;</span>
+
+<span class="sd">            # run the application</span>
+<span class="sd">            if __name__ == &#39;__main__&#39;:</span>
+<span class="sd">                app.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrumentation_key</span><span class="p">,</span> <span class="n">wsgi_application</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of the class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            instrumentation_key (str). the instrumentation key to use while sending telemetry to the service.\n</span>
+<span class="sd">            wsgi_application (func). the WSGI application that we&#39;re wrapping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumentation_key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Instrumentation key was required but not provided&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">wsgi_application</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;WSGI application was required but not provided&#39;</span><span class="p">)</span>
+        <span class="n">telemetry_channel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;telemetry_channel&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;telemetry_channel&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;telemetry_channel&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">applicationinsights</span><span class="o">.</span><span class="n">TelemetryClient</span><span class="p">(</span><span class="n">instrumentation_key</span><span class="p">,</span> <span class="n">telemetry_channel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wsgi_application</span> <span class="o">=</span> <span class="n">wsgi_application</span>
+
+<div class="viewcode-block" id="WSGIApplication.flush"><a class="viewcode-back" href="../../../applicationinsights.requests.html#applicationinsights.requests.WSGIApplication.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Flushes the queued up telemetry to the service.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callable implementation for WSGI middleware.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            environ (dict). a dictionary containing all WSGI environment properties for this request.\n</span>
+<span class="sd">            start_response (func). a function used to store the status, HTTP headers to be sent to the client and optional exception information.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (obj). the response to send back to the client.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span>
+        <span class="k">if</span> <span class="s">&#39;PATH_INFO&#39;</span> <span class="ow">in</span> <span class="n">environ</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH_INFO&#39;</span><span class="p">]</span>
+        <span class="n">closure</span> <span class="o">=</span> <span class="n">Closure</span><span class="p">()</span>
+        <span class="n">closure</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+
+        <span class="k">def</span> <span class="nf">status_interceptor</span><span class="p">(</span><span class="n">status_string</span><span class="p">,</span> <span class="n">headers_array</span><span class="p">):</span>
+            <span class="n">closure</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status_string</span>
+            <span class="n">start_response</span><span class="p">(</span><span class="n">status_string</span><span class="p">,</span> <span class="n">headers_array</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wsgi_application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">status_interceptor</span><span class="p">)</span>
+        <span class="n">response_code</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;\s*(?P&lt;code&gt;\d+)&#39;</span><span class="p">,</span> <span class="n">closure</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&#39;code&#39;</span><span class="p">)</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">response_code</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">http_method</span> <span class="o">=</span> <span class="s">&#39;GET&#39;</span>
+        <span class="k">if</span> <span class="s">&#39;REQUEST_METHOD&#39;</span> <span class="ow">in</span> <span class="n">environ</span><span class="p">:</span>
+            <span class="n">http_method</span> <span class="o">=</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="s">&#39;QUERY_STRING&#39;</span> <span class="ow">in</span> <span class="n">environ</span><span class="p">:</span>
+            <span class="n">query_string</span> <span class="o">=</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;QUERY_STRING&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">query_string</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="n">query_string</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">track_request</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;Z&#39;</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">response_code</span><span class="p">,</span> <span class="n">http_method</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>

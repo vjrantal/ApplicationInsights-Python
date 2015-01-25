@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>applicationinsights.requests module &mdash; Application Insights SDK for Python 0.8.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/overrides.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="Application Insights SDK for Python 0.8.0 documentation" href="index.html" />
+    <link rel="up" title="applicationinsights.exceptions module" href="applicationinsights.exceptions.html" />
+    <link rel="next" title="applicationinsights.channel module" href="applicationinsights.channel.html" />
+    <link rel="prev" title="applicationinsights.exceptions module" href="applicationinsights.exceptions.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="applicationinsights.channel.html" title="applicationinsights.channel module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="applicationinsights.exceptions.html" title="applicationinsights.exceptions module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li>
+          <li><a href="applicationinsights.html" >applicationinsights module</a> &raquo;</li>
+          <li><a href="applicationinsights.logging.html" >applicationinsights.logging module</a> &raquo;</li>
+          <li><a href="applicationinsights.exceptions.html" accesskey="U">applicationinsights.exceptions module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="applicationinsights-requests-module">
+<h1>applicationinsights.requests module<a class="headerlink" href="#applicationinsights-requests-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="wsgiapplication-class">
+<h2>WSGIApplication class<a class="headerlink" href="#wsgiapplication-class" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="applicationinsights.requests.WSGIApplication">
+<em class="property">class </em><code class="descclassname">applicationinsights.requests.</code><code class="descname">WSGIApplication</code><span class="sig-paren">(</span><em>instrumentation_key</em>, <em>wsgi_application</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/requests/WSGIApplication.html#WSGIApplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.requests.WSGIApplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents a WSGI wrapper that enables request telemetry for existing WSGI applications. The request
+telemetry will be sent to Application Insights service using the supplied instrumentation key.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">applicationinsights.requests</span> <span class="kn">import</span> <span class="n">WSGIApplication</span>
+
+<span class="c"># instantiate the Flask application and wrap its WSGI application</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">wsgi_app</span> <span class="o">=</span> <span class="n">WSGIApplication</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">wsgi_app</span><span class="p">)</span>
+
+<span class="c"># define a simple route</span>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">&#39;Hello World!&#39;</span>
+
+<span class="c"># run the application</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="applicationinsights.requests.WSGIApplication.flush">
+<code class="descname">flush</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/requests/WSGIApplication.html#WSGIApplication.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.requests.WSGIApplication.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flushes the queued up telemetry to the service.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">applicationinsights.requests module</a><ul>
+<li><a class="reference internal" href="#wsgiapplication-class">WSGIApplication class</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="applicationinsights.exceptions.html"
+                        title="previous chapter">applicationinsights.exceptions module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="applicationinsights.channel.html"
+                        title="next chapter">applicationinsights.channel module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/applicationinsights.requests.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="applicationinsights.channel.html" title="applicationinsights.channel module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="applicationinsights.exceptions.html" title="applicationinsights.exceptions module"
+             >previous</a> |</li>
+        <li><a href="index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li>
+          <li><a href="applicationinsights.html" >applicationinsights module</a> &raquo;</li>
+          <li><a href="applicationinsights.logging.html" >applicationinsights.logging module</a> &raquo;</li>
+          <li><a href="applicationinsights.exceptions.html" >applicationinsights.exceptions module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Microsoft.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>

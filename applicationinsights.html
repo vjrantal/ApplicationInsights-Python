@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>applicationinsights module &mdash; Application Insights SDK for Python 0.7.0 documentation</title>
+    <title>applicationinsights module &mdash; Application Insights SDK for Python 0.8.0 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="Application Insights SDK for Python 0.7.0 documentation" href="index.html" />
+    <link rel="top" title="Application Insights SDK for Python 0.8.0 documentation" href="index.html" />
     <link rel="next" title="applicationinsights.logging module" href="applicationinsights.logging.html" />
     <link rel="prev" title="Application Insights SDK for Python" href="index.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="index.html" title="Application Insights SDK for Python"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Application Insights SDK for Python 0.7.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -125,6 +125,25 @@ being used.</p>
 <dd><p class="first">name (str). the name of the page that was viewed.</p>
 <p>url (str). the URL of the page that was viewed.</p>
 <p>duration (int). the duration of the page view in milliseconds. (defaults to: 0)</p>
+<p>properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
+<p class="last">measurements (dict). the set of custom measurements the client wants to attach to this data item. (defaults to: None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="applicationinsights.TelemetryClient.track_request">
+<code class="descname">track_request</code><span class="sig-paren">(</span><em>name</em>, <em>url</em>, <em>success</em>, <em>start_time=None</em>, <em>duration=None</em>, <em>response_code=None</em>, <em>http_method=None</em>, <em>properties=None</em>, <em>measurements=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/applicationinsights/TelemetryClient.html#TelemetryClient.track_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#applicationinsights.TelemetryClient.track_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a single request that was captured for the application.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">name (str). the name for this request. All requests with the same name will be grouped together.</p>
+<p>url (str). the actual URL for this request (to show in individual request instances).</p>
+<p>success (bool). true if the request ended in success, false otherwise.</p>
+<p>start_time (str). the start time of the request. The value should look the same as the one returned by <code class="xref py py-func docutils literal"><span class="pre">datetime.isoformat()</span></code> (defaults to: None)</p>
+<p>duration (int). the number of milliseconds that this request lasted. (defaults to: None)</p>
+<p>response_code (string). the response code that this request returned. (defaults to: None)</p>
+<p>http_method (string). the HTTP method that triggered this request. (defaults to: None)</p>
 <p>properties (dict). the set of custom properties the client wants attached to this data item. (defaults to: None)</p>
 <p class="last">measurements (dict). the set of custom measurements the client wants to attach to this data item. (defaults to: None)</p>
 </dd>
@@ -226,7 +245,7 @@ this value.</p>
         <li class="right" >
           <a href="index.html" title="Application Insights SDK for Python"
              >previous</a> |</li>
-        <li><a href="index.html">Application Insights SDK for Python 0.7.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Application Insights SDK for Python 0.8.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
