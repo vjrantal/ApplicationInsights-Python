@@ -215,10 +215,10 @@ tc.channel.sender.send_interval = 0.5
 </div>
 <p id="usage-sample-12"><strong>Basic logging configuration (second option)</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">applicationinsights.logging</span> <span class="kn">import</span> <span class="n">ApplicationInsightsHandler</span>
+<span class="kn">from</span> <span class="nn">applicationinsights.logging</span> <span class="kn">import</span> <span class="n">LoggingHandler</span>
 
 <span class="c"># set up logging</span>
-<span class="n">handler</span> <span class="o">=</span> <span class="n">ApplicationInsightsHandler</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">LoggingHandler</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">handlers</span><span class="o">=</span><span class="p">[</span> <span class="n">handler</span> <span class="p">],</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(levelname)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
 <span class="c"># log something (this will be sent to the Application Insights service as a trace)</span>
@@ -236,10 +236,10 @@ tc.channel.sender.send_interval = 0.5
 </div>
 <p id="usage-sample-13"><strong>Advanced logging configuration</strong></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">applicationinsights.logging</span> <span class="kn">import</span> <span class="n">ApplicationInsightsHandler</span>
+<span class="kn">from</span> <span class="nn">applicationinsights.logging</span> <span class="kn">import</span> <span class="n">LoggingHandler</span>
 
 <span class="c"># set up logging</span>
-<span class="n">handler</span> <span class="o">=</span> <span class="n">ApplicationInsightsHandler</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">LoggingHandler</span><span class="p">(</span><span class="s">&#39;&lt;YOUR INSTRUMENTATION KEY GOES HERE&gt;&#39;</span><span class="p">)</span>
 <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(levelname)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">))</span>
 <span class="n">my_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;simple_logger&#39;</span><span class="p">)</span>
