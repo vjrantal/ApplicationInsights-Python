@@ -1,4 +1,5 @@
 import json
+import logging
 
 try:
     # Python 2.x
@@ -136,10 +137,11 @@ class SenderBase(object):
             if 200 <= status_code < 300:
                 return
         except HTTPError as e:
+            logging.error(repr(e))
             if e.getcode() == 400:
                 return
         except Exception as e:
-            pass
+            logging.error(repr(e))
 
         # Add our unsent data back on to the queue
         for data in data_to_send:
